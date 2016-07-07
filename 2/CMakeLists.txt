@@ -2,8 +2,9 @@ cmake_minimum_required (VERSION 2.6)
 project (OA2)
 
 add_executable(OA2
-main.cpp
-main.h)
+    aluno.cpp
+    main.cpp
+)
 
 include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
