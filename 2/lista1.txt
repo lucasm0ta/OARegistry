@@ -1,0 +1,4 @@
+ID001 024312 Leonardo                34    G         AB
+ID019 031272 Andreza                 34    G         AB
+ID002 035830 Rogerio                 34    G         AX
+ID004 041881 Ana Luisa               34    G         AX

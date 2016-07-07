@@ -1,6 +1,7 @@
 #include "aluno.hpp"
 #include <list>
-std::list<Aluno> populate();
+
+void populate();
 
 //insert student in registry file
 int insertStudent();

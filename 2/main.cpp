@@ -1,12 +1,15 @@
 #include "main.hpp"
 #include <stdio.h>
 #include <iostream>
+#include <iomanip>
+#include <regex>
 
 std::list<Aluno*> alns;
 bool sorted = false;
 
 int main()
 {
+    populate();
     int flag = 1;
     while (flag) {
         int input = 0;
@@ -41,11 +44,11 @@ int main()
     return 0;
 }
 
-std::list<Aluno> populate()
+void populate()
 {
     int c, pos, size = 1024;
     char *buffer = (char *)malloc(size);
-    FILE *fp = fopen("lista1.txt","w+");
+    FILE *fp = fopen("lista1.txt","r");
     do { // read all lines in file
         pos = 0;
         do{ // read one line
@@ -59,10 +62,11 @@ std::list<Aluno> populate()
         buffer[pos] = 0;
         // line is now in buffer
         std::string buff(buffer);
-        unsigned int id = getIdFromLine(buff);//get ID
+        std::cout << buffer << "kkk"<< std::endl;
+        /*unsigned int id = getIdFromLine(buff);//get ID
         std::string name = getNameFromLine(buff);//get name
         alns.push_back(new Aluno(name, id));
-        sorted = false;
+        sorted = false;*/
     } while(c != EOF);
 }
 int insertStudent()
@@ -91,7 +95,7 @@ unsigned int getHighId()
 void printAll()
 {
     for(auto it = alns.begin(); it != alns.end(); it++){
-        std::cout << "ID" << (*it)->getId() << '\t' << (*it)->getName() << std::endl;
+        std::cout << "ID" << std::setfill('0') << std::setw(3) << (*it)->getId() << '\t' << (*it)->getName() << std::endl;
     }
 }
 
@@ -124,5 +128,7 @@ int search()
 }
 
 std::string getNameFromLine(std::string buffer){
-
+    std::string nome = buffer.substr(14,24);
+    nome = std::regex_replace(nome, std::regex("^ +| +$|( ) +"), "$1");
+    return nome;
 }
