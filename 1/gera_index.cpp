@@ -1,30 +1,39 @@
 #include <iostream>
 #include <fstream>
-#include <vector>
 
-int sortFile(std::string filename)
-{
-	using namespace std;
-	string line;
-	vector<string> key;
-	ifstream infile;
-	ofstream outfile;
+// int writetoFile(std:string filename, std::string key, int reference)
+// {
+// 	using namespace std;
+// 	string line;
+// 	vector<string> key;
+//
+// 	oftream outfile;
+// 	outfile.open(nomesaida.c_str());
+// 	outfile.close();
+// }
 
-	infile.open(filename.c_str());
-	while(getline(infile, line))
-	{
-		key.push_back(line.substr(0,5));
-		cout << key.back() << endl;
-	}
-
-	return 0;
-}
+struct node {
+  std::string key;
+  int pos;
+  node *next;
+};
 
 int readList(char* argv)
 {
 	using namespace std;
-	int i;
+	int i, j;
 	string line, nomesaida;
+
+	node *root;
+	root = new node;
+	root->key = "0";
+	root->next = 0;
+	root->pos = 0;
+
+	node *cur;
+	cur = root;
+
+	node* newnode;
 
 	nomesaida = "index_";
 	nomesaida.append(argv);
@@ -34,18 +43,26 @@ int readList(char* argv)
 	ofstream outfile;
 
 	infile.open(argv);
-	outfile.open(nomesaida.c_str());
 	i = 0;
 	while(getline(infile, line))
 	{
-		outfile << line.substr(0,5) << " " << i << endl;
+		for(cur; cur->next != 0 && cur->next->key < line.substr(0,5); cur = cur->next);
+		newnode = new node;
+		newnode->next = cur->next;
+		newnode->pos = i;
+		newnode->key = line.substr(0,5);
+		cur->next = newnode;
 		i++;
 	}
-	outfile.close();
+
+	if(root->next != 0)
+		cur = root->next;
+	outfile.open(nomesaida.c_str());
+	for(cur; cur->next != 0; cur = cur->next)
+	{
+		outfile << cur->key << " " << cur->pos << endl;
+	}
 	infile.close();
-
-	sortFile(nomesaida);
-
 	return 0;
 }
 
@@ -73,6 +90,8 @@ int main(int argc, char** argv)
 	}
 
 	readList(argv[1]);
+	readList(argv[2]);
+	readList(argv[3]);
 
 	return 0;
 }
