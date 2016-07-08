@@ -24,7 +24,7 @@ int main()
             case 2: //Jubilar
                 removeStudent();
                 break;
-            case 3: //Dar Note
+            case 3: //Dar Nota
                 gradeStudent();
                 break;
             case 4: //Relatório
@@ -55,9 +55,8 @@ void populate()
             // line is now in buffer
             unsigned int id = getUserIdFromLine(line);//get ID
             std::string name = getNameFromLine(line);//get name
-            // std::cout << id<<" "<<name << std::endl;
+            // std::cout << id<<"~"<<name << std::endl;
             alns.push_back(new Aluno(name, id));
-            sorted = false;
         }
     }
     infile.close();
@@ -71,12 +70,38 @@ void populate()
             unsigned int id = getUserIdFromLine(line);//get ID
             float res = getGrade(line);//get name
             std::string paper = getPaperIdFromLine(line);//get name
-            std::cout << id << "-" << paper << "-" << res << std::endl;
-            // alns.push_back(new Aluno(name, id));
+            // std::cout << id << "-" << paper << "-" << res << std::endl;
+            for(auto it = alns.begin(); it != alns.end(); it++){
+                if ((*it)->getId() == id) {
+                    std::pair<std::string, float> par(paper,res);
+                    (*it)->results.push_front(par);
+                }
+            }
             // sorted = false;
         }
     }
     infile2.close();
+
+    std::ifstream infile3("lista3.txt");
+    if (infile3) {
+        while (std::getline(infile3, line)) {
+            // line is now in buffer
+            // std::cout << line << std::endl;
+            unsigned int id = getUserIdFromLine(line);//get ID
+            float res = getGrade(line);//get name
+            std::string paper = getPaperIdFromLine(line);//get name
+            // std::cout << id << "-" << paper << "-" << res << std::endl;
+            for(auto it = alns.begin(); it != alns.end(); it++){
+                if ((*it)->getId() == id) {
+                    std::pair<std::string, float> par(paper,res);
+                    (*it)->results.push_front(par);
+                }
+            }
+            // sorted = false;
+        }
+    }
+    infile3.close();
+    alns.sort(Aluno::compare);
 }
 int insertStudent()
 {
@@ -141,7 +166,12 @@ int gradeStudent()
 
 int report()
 {
-
+    for(auto it = alns.begin(); it != alns.end(); it++) {
+        std::cout << "ID" << std::setfill('0') << std::setw(3) << (*it)->getId() << '\t' << (*it)->getName() << std::endl;
+        for(auto it2 = (*it)->results.begin(); it2 != (*it)->results.end(); it2++) {
+            std::cout << '\t' <<"Materia: " << (*it2).first << " Nota: " <<(*it2).second<<std::endl;
+        }
+    }
 }
 
 int search()
