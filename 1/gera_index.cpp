@@ -57,6 +57,9 @@ int readSecListFixed(char* argv)
 		if(rootsec == NULL)
 		{
 			rootsec = newsecnode;
+			newsecnode->rootkey = new seckey;
+			newsecnode->rootkey->key = line.substr(0,5);
+			newsecnode->rootkey->nextseckey = NULL;
 		}
 		else
 		{
@@ -69,29 +72,58 @@ int readSecListFixed(char* argv)
 			}
 			if((tempsec != NULL) && (tempsec->nome == newsecnode->nome))
 			{
+				newseckey = new seckey;
+				newseckey->key = line.substr(0,5);
+				newseckey->nextseckey = NULL;
+				prevseckey = NULL;
+				tempseckey = tempsec->rootkey;
+				while(tempseckey != NULL && tempseckey->key < line.substr(0,5))
+				{
+					prevseckey = tempseckey;
+					tempseckey = tempseckey->nextseckey;
+				}
+				if(!tempseckey)
+				{
+					prevseckey->nextseckey = newseckey;
+				}
+				else
+				{
+					if(prevseckey)
+					{
+						newseckey->nextseckey = prevseckey->nextseckey;
+						prevseckey->nextseckey = newseckey;
+					}
+					else
+					{
+						newseckey->nextseckey = tempsec->rootkey;
+						tempsec->rootkey = newseckey;
+					}
+				}
 				cout << tempsec->nome << " "<< "IGUAIS" << endl;
-			}
-			if(!tempsec)
-			{
-				prevsecnode->nextsec = newsecnode;
 			}
 			else
 			{
-				if(prevsecnode)
+				if(!tempsec)
 				{
-					newsecnode->nextsec = prevsecnode->nextsec;
 					prevsecnode->nextsec = newsecnode;
 				}
 				else
 				{
-					newsecnode->nextsec = rootsec;
-					rootsec = newsecnode;
+					if(prevsecnode)
+					{
+						newsecnode->nextsec = prevsecnode->nextsec;
+						prevsecnode->nextsec = newsecnode;
+					}
+					else
+					{
+						newsecnode->nextsec = rootsec;
+						rootsec = newsecnode;
+					}
 				}
-				newsecnode->rootkey = new seckey;
-				newsecnode->rootkey->key = line.substr(0,5);
-				newsecnode->rootkey->nextseckey = NULL;
 			}
-
+			newsecnode->rootkey = new seckey;
+			newsecnode->rootkey->key = line.substr(0,5);
+			newsecnode->rootkey->nextseckey = NULL;
 		}
 	}
 
@@ -101,8 +133,15 @@ int readSecListFixed(char* argv)
 	outfile << r << endl;
 	for(tempsec = rootsec; tempsec != NULL; tempsec = tempsec->nextsec)
 	{
-		cout << tempsec->nome << endl;
+		outfile << tempsec->nome;
+		for(tempseckey = tempsec->rootkey; tempseckey != NULL; tempseckey = tempseckey->nextseckey)
+		{
+			outfile << " ";
+			outfile << tempseckey->key;
+		}
+		outfile << endl;
 	}
+
 
 	infile.close();
 }
@@ -138,6 +177,7 @@ int readList(char* argv)
 		if(root == NULL)
 		{
 			root = newnode;
+			i++;
 		}
 		else
 		{
