@@ -1,16 +1,8 @@
 #include <iostream>
 #include <fstream>
+#include <sstream>
+#include <iomanip>
 
-// int writetoFile(std:string filename, std::string key, int reference)
-// {
-// 	using namespace std;
-// 	string line;
-// 	vector<string> key;
-//
-// 	oftream outfile;
-// 	outfile.open(nomesaida.c_str());
-// 	outfile.close();
-// }
 
 struct node {
   std::string key;
@@ -21,8 +13,9 @@ struct node {
 int readList(char* argv)
 {
 	using namespace std;
-	int i, j;
+	int i, j, removed = 0;
 	string line, nomesaida;
+	stringstream rr;
 
 	node *root;
 	root = new node;
@@ -58,6 +51,9 @@ int readList(char* argv)
 	if(root->next != 0)
 		cur = root->next;
 	outfile.open(nomesaida.c_str());
+	rr << setw(3) << setfill('0') << removed;
+	string r = rr.str();
+	outfile << r << endl;
 	for(cur; cur->next != 0; cur = cur->next)
 	{
 		outfile << cur->key << " " << cur->pos << endl;
