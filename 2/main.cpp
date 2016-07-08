@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <iomanip>
+#include <fstream>
 #include <regex>
 
 std::list<Aluno*> alns;
@@ -46,28 +47,36 @@ int main()
 
 void populate()
 {
-    int c, pos, size = 1024;
-    char *buffer = (char *)malloc(size);
-    FILE *fp = fopen("lista1.txt","r");
-    do { // read all lines in file
-        pos = 0;
-        do{ // read one line
-            c = fgetc(fp);
-            if(c != EOF) buffer[pos++] = (char)c;
-            if(pos >= size - 1) { // increase buffer length - leave room for 0
-                size *=2;
-                buffer = (char*)realloc(buffer, size);
-            }
-        }while(c != EOF && c != '\n');
-        buffer[pos] = 0;
-        // line is now in buffer
-        std::string buff(buffer);
-        std::cout << buffer << "kkk"<< std::endl;
-        /*unsigned int id = getIdFromLine(buff);//get ID
-        std::string name = getNameFromLine(buff);//get name
-        alns.push_back(new Aluno(name, id));
-        sorted = false;*/
-    } while(c != EOF);
+    std::string line;
+    //Read students file
+    std::ifstream infile("lista1.txt");
+    if (infile) {
+        while (std::getline(infile, line)) {
+            // line is now in buffer
+            unsigned int id = getUserIdFromLine(line);//get ID
+            std::string name = getNameFromLine(line);//get name
+            // std::cout << id<<" "<<name << std::endl;
+            alns.push_back(new Aluno(name, id));
+            sorted = false;
+        }
+    }
+    infile.close();
+
+    //Read paper file
+    std::ifstream infile2("lista2.txt");
+    if (infile2) {
+        while (std::getline(infile2, line)) {
+            // line is now in buffer
+            // std::cout << line << std::endl;
+            unsigned int id = getUserIdFromLine(line);//get ID
+            float res = getGrade(line);//get name
+            std::string paper = getPaperIdFromLine(line);//get name
+            std::cout << id << "-" << paper << "-" << res << std::endl;
+            // alns.push_back(new Aluno(name, id));
+            // sorted = false;
+        }
+    }
+    infile2.close();
 }
 int insertStudent()
 {
@@ -79,7 +88,7 @@ int insertStudent()
     unsigned int reg = (alns.size()>0) ? getHighId() + 1: 0;
 
     //insere ele na lista1
-    alns.push_back(new Aluno(name, reg));
+    alns.push_front(new Aluno(name, reg));
     // *fp = fopen("lista1.txt","w+");
 }
 
@@ -99,12 +108,25 @@ void printAll()
     }
 }
 
-unsigned int getIdFromLine(std::string buffer)
+unsigned int getUserIdFromLine(std::string const buffer)
 {
     std::string val = buffer.substr(2, 3);
     std::string::size_type sz;
     int final = std::stoi (val,&sz);
     return (unsigned int) final;
+}
+
+std::string getPaperIdFromLine(std::string const input)
+{
+    std::istringstream iss(input);
+    std::string token,ret;
+    int i = 0;
+    while (std::getline(iss, token, '|') && i < 2)
+    {
+        ret = token;
+        i++;
+    }
+    return ret;
 }
 
 int removeStudent()
@@ -128,7 +150,22 @@ int search()
 }
 
 std::string getNameFromLine(std::string buffer){
-    std::string nome = buffer.substr(14,24);
+    std::string nome = buffer.substr(13,24);
     nome = std::regex_replace(nome, std::regex("^ +| +$|( ) +"), "$1");
     return nome;
+}
+
+float getGrade(std::string const &input) {
+    std::istringstream iss(input);
+    std::string token,ret;
+    while (std::getline(iss, token, '|'))
+    {
+        ret = token;
+    }
+    if(ret.size() > 0) {
+        std::size_t found = ret.find(",");
+        if (found != std::string::npos)
+            ret.replace(found, 1, ".");
+    }
+    return std::stof(ret);
 }

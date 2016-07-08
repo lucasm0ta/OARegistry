@@ -1,5 +1,7 @@
 #include "aluno.hpp"
 #include <list>
+#include <vector>
+#include <string>
 
 void populate();
 
@@ -20,8 +22,12 @@ int search();
 //Get heighest id in the registry file
 unsigned int getHighId();
 
-unsigned int getIdFromLine(std::string buffer);
+unsigned int getUserIdFromLine(std::string buffer);
+
+std::string getPaperIdFromLine(std::string buffer);
 
 std::string getNameFromLine(std::string buffer);
+
+float getGrade(std::string const &input);
 
 void printAll();
