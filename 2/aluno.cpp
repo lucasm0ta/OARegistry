@@ -3,25 +3,13 @@
 //construtor
 Aluno::Aluno(std::string nome)
 {
-    _nome = nome;
+    _name = nome;
     //seta id como maior
 }
 Aluno::Aluno(std::string nome, unsigned int id)
 {
-    _nome = nome;
+    _name = nome;
     _id = id;
-}
-
-//retorna o nome do
-std::string Aluno::getName()
-{
-    return _nome;
-}
-
-//retorna o id
-unsigned int Aluno::getId()
-{
-    return _id;
 }
 
 bool Aluno::compare(Aluno *a1, Aluno *a2)
