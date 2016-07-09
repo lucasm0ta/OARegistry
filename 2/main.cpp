@@ -224,12 +224,17 @@ int gradeStudent()
             grade = floorf(grade * 10) / 10;
 
             std::ostringstream final;
-            final << "ID" << std::setfill('0') << std::setw(3) << id;
+            final << "\nID" << std::setfill('0') << std::setw(3) << id;
             final << "|024312|" << getName(id) << "|";
             final << grade;
 
-            std::string fileName = "lista" + std::to_string(paper) + ".txt";
+            std::string fileName = "lista" + std::to_string(paper+1) + ".txt";
             insertAtEnd(fileName, final.str());
+            
+            char file[1024];
+            strcpy(file, fileName.c_str());
+            readList(file);
+            
 
         } else {
             std::cout << "Matéria inválida!" << std::endl;
