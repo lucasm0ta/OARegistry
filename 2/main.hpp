@@ -28,6 +28,16 @@ std::string getPaperIdFromLine(std::string buffer);
 
 std::string getNameFromLine(std::string buffer);
 
-float getGrade(std::string const &input);
+float getGradeFromLine(std::string buffer);
+
+std::string getName(unsigned int id);
+
+float getGrade(int file, unsigned int id);
+
+int getPositionFromLine(std::string const line);
 
 void printAll();
+
+std::string readNthLine(const std::string& filename, int N);
+
+void insertAtEnd(const std::string& filename, const std::string& data);

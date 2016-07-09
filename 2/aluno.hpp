@@ -5,24 +5,25 @@
 class Aluno{
 private:
     unsigned int _id;
-    std::string _name;
+    int _pos;
 
-    //Uma lista de pares<Materia, Nota>
 public:
-    std::list<std::pair<std::string, float>> results;
+    //Uma lista de pares<Materia, position>
+    std::list<std::pair<int, int>> results;
     //construtor
-    Aluno(std::string name);
+    Aluno(int pos);
 
-    Aluno(std::string name, unsigned int id);
+    Aluno(unsigned int id);
+
+    Aluno(unsigned int id, int pos);
 
     ~Aluno();
 
     //retorna o nome do
-    std::string getName()
+    int getPosition()
     {
-        return _name;
+        return _pos;
     }
-
 
     //retorn o id
     unsigned int getId()
@@ -31,4 +32,8 @@ public:
     }
     //compara os alunos
     static bool compare(Aluno *a1, Aluno *a2);
+
+    static std::string getName(unsigned int id);
+
+    int getPaperPosition(int paper);
 };

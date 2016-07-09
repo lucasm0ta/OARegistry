@@ -4,13 +4,15 @@
 #include <iomanip>
 #include <fstream>
 #include <regex>
+#include <math.h>
 
-std::list<Aluno*> alns;
+std::list<Aluno*> alunos;
 bool sorted = false;
+int removed = 0;
 
 int main()
 {
-    populate();
+    populate();//read files and populate
     int flag = 1;
     while (flag) {
         int input = 0;
@@ -31,7 +33,7 @@ int main()
                 report();
                 break;
             case 5: //Buscar
-                printAll();
+                // printAll();
                 search();
                 break;
             case 6: //Sair
@@ -49,32 +51,37 @@ void populate()
 {
     std::string line;
     //Read students file
-    std::ifstream infile("lista1.txt");
+    std::ifstream infile("index_lista1.txt");
     if (infile) {
         while (std::getline(infile, line)) {
-            // line is now in buffer
-            unsigned int id = getUserIdFromLine(line);//get ID
-            std::string name = getNameFromLine(line);//get name
-            // std::cout << id<<"~"<<name << std::endl;
-            alns.push_back(new Aluno(name, id));
+            if(line.size() > 4) {
+                // line is now in buffer
+                unsigned int id = getUserIdFromLine(line);//get ID
+                int pos = getPositionFromLine(line);
+                // std::string name = getNameFromLine(line);//get name
+                std::cout << id << "~" << pos << std::endl;
+                alunos.push_back(new Aluno(id, pos));
+            }
         }
     }
     infile.close();
 
     //Read paper file
-    std::ifstream infile2("lista2.txt");
+    line = "";
+    std::ifstream infile2("index_lista2.txt");
     if (infile2) {
         while (std::getline(infile2, line)) {
-            // line is now in buffer
-            // std::cout << line << std::endl;
-            unsigned int id = getUserIdFromLine(line);//get ID
-            float res = getGrade(line);//get name
-            std::string paper = getPaperIdFromLine(line);//get name
-            // std::cout << id << "-" << paper << "-" << res << std::endl;
-            for(auto it = alns.begin(); it != alns.end(); it++){
-                if ((*it)->getId() == id) {
-                    std::pair<std::string, float> par(paper,res);
-                    (*it)->results.push_front(par);
+            if(line.size() > 4) {
+                // std::cout << "*" <<line << std::endl;
+                unsigned int id = getUserIdFromLine(line);//get ID
+                int pos = getPositionFromLine(line);//get name
+                int paper = 1;//getPaperIdFromLine(line);//get name
+                std::cout << id << "-" << paper << "-" << pos << std::endl;
+                for(auto it = alunos.begin(); it != alunos.end(); it++){
+                    if ((*it)->getId() == id) {
+                        std::pair<int, int> par(paper, pos);
+                        (*it)->results.push_front(par);
+                    }
                 }
             }
             // sorted = false;
@@ -82,26 +89,27 @@ void populate()
     }
     infile2.close();
 
-    std::ifstream infile3("lista3.txt");
+    line = "";
+    std::ifstream infile3("index_lista3.txt");
     if (infile3) {
         while (std::getline(infile3, line)) {
             // line is now in buffer
             // std::cout << line << std::endl;
-            unsigned int id = getUserIdFromLine(line);//get ID
-            float res = getGrade(line);//get name
-            std::string paper = getPaperIdFromLine(line);//get name
+            // unsigned int id = getUserIdFromLine(line);//get ID
+            // int pos = getPositionFromLine(line);//get name
+            // int paper = 2;//getPaperIdFromLine(line);//get name
             // std::cout << id << "-" << paper << "-" << res << std::endl;
-            for(auto it = alns.begin(); it != alns.end(); it++){
-                if ((*it)->getId() == id) {
-                    std::pair<std::string, float> par(paper,res);
-                    (*it)->results.push_front(par);
-                }
-            }
+            // for(auto it = alunos.begin(); it != alunos.end(); it++){
+            //     if ((*it)->getId() == id) {
+            //         std::pair<int, int> par(paper, pos);
+            //         (*it)->results.push_front(par);
+            //     }
+            // }
             // sorted = false;
         }
     }
     infile3.close();
-    alns.sort(Aluno::compare);
+    alunos.sort(Aluno::compare);
 }
 int insertStudent()
 {
@@ -109,27 +117,46 @@ int insertStudent()
     printf("Insira o seu nome: ");
     std::string name;
     std::cin >> name;
+    std::ostringstream final;
     //checar reg e pegar maior id e incrementar
-    unsigned int reg = (alns.size()>0) ? getHighId() + 1: 0;
+    unsigned int id = (alunos.size() > 0) ? getHighId() + 1: 0;
+    final << "ID" << std::setfill('0') << std::setw(3) << id;
+    final << " 111111 ";
+    final << name << std::setfill(' ') << std::setw(37);
+    final << "34    G         AB\n";
+
+    insertAtEnd("lista1.txt", final.str());
+    int pos = 0;
+    std::string line;
+    std::ifstream myfile("lista1.txt");
+
+    while (std::getline(myfile, line))
+        ++pos;
+    alunos.push_back(new Aluno(id, pos-1));
+
+    alunos.sort(Aluno::compare);
+
+    //TODO Redo registry of first
 
     //insere ele na lista1
-    alns.push_front(new Aluno(name, reg));
+    // alunos.push_front(new Aluno(name, reg));
     // *fp = fopen("lista1.txt","w+");
 }
 
 unsigned int getHighId()
 {
     if (!sorted) {
-        alns.sort(Aluno::compare);
+        alunos.sort(Aluno::compare);
         sorted = true;
     }
-    if(alns.size())
-    return alns.front()->getId();
+    if(alunos.size())
+    return alunos.front()->getId();
 }
 void printAll()
 {
-    for(auto it = alns.begin(); it != alns.end(); it++){
-        std::cout << "ID" << std::setfill('0') << std::setw(3) << (*it)->getId() << '\t' << (*it)->getName() << std::endl;
+    for(auto it = alunos.begin(); it != alunos.end(); it++){
+        unsigned int id = (*it)->getId();
+        std::cout << "ID" << std::setfill('0') << std::setw(3) << id << '\t' << getName(id) << std::endl;
     }
 }
 
@@ -154,22 +181,72 @@ std::string getPaperIdFromLine(std::string const input)
     return ret;
 }
 
+int getPositionFromLine(std::string const line)
+{
+    std::string val = line.substr(6,line.size()-6);
+    std::string::size_type sz;
+    return std::stoi (val,&sz);
+}
+
+
 int removeStudent()
 {
-
+    int id;
+    std::cout << "Insira o ID do aluno a ser removido(ex: 001):" << std::endl;
+    std::cin >> id;
+    for(auto it = alunos.begin(); it != alunos.end(); it++) {
+        if((*it)->getId() == id) {
+            alunos.erase(it);
+            break;
+        }
+    }
 }
 
 int gradeStudent()
 {
+    int id;
+    std::list<Aluno*>::iterator al;
+    std::cout << "Insira o ID do aluno (ex: 001):" << std::endl;
+    std::cin >> id;
+    for(auto it = alunos.begin(); it != alunos.end(); it++) {
+        al = it;
+        if((*it)->getId() == id) {
+            break;
+        }
+    }
+    if(al != alunos.end()){
+        std::cout << "Insira o id da materia (1 ou 2):" << std::endl;
+        int paper;
+        std::cin >> paper;
+        if (paper == 1 || paper == 2) {
+            std::cout << "Insira o a nota(ex: 7.8):" << std::endl;
+            float grade;
+            std::cin >> grade;
+            grade = floorf(grade * 10) / 10;
 
+            std::ostringstream final;
+            final << "ID" << std::setfill('0') << std::setw(3) << id;
+            final << "|024312|" << getName(id) << "|";
+            final << grade;
+
+            std::string fileName = "lista" + std::to_string(paper) + ".txt";
+            insertAtEnd(fileName, final.str());
+
+        } else {
+            std::cout << "Matéria inválida!" << std::endl;
+        }
+    } else {
+        std::cout << "ID não encontrado." << std::endl;
+    }
 }
 
 int report()
 {
-    for(auto it = alns.begin(); it != alns.end(); it++) {
-        std::cout << "ID" << std::setfill('0') << std::setw(3) << (*it)->getId() << '\t' << (*it)->getName() << std::endl;
+    for(auto it = alunos.begin(); it != alunos.end(); it++) {
+        unsigned int id = (*it)->getId();
+        std::cout << "ID" << std::setfill('0') << std::setw(3) << id << '\t' << getName(id) << std::endl;
         for(auto it2 = (*it)->results.begin(); it2 != (*it)->results.end(); it2++) {
-            std::cout << '\t' <<"Materia: " << (*it2).first << " Nota: " <<(*it2).second<<std::endl;
+            std::cout << '\t' <<"Materia: " << (*it2).first << " Nota: " << getGrade((*it2).first, (*it2).second) << std::endl;
         }
     }
 }
@@ -179,13 +256,30 @@ int search()
 
 }
 
+float getGrade(int file, unsigned int pos) {
+    if (file == 1) {
+        return getGradeFromLine(readNthLine("lista2.txt", pos));
+    } else {
+        return getGradeFromLine(readNthLine("lista2.txt", pos));
+    }
+}
+std::string getName(unsigned int id)
+{
+    for(auto it = alunos.begin(); it != alunos.end(); it++) {
+        unsigned int auxid = (*it)->getId();
+        if (auxid == id) {
+            return getNameFromLine(readNthLine("lista1.txt", ((*it)->getPosition())));
+        }
+    }
+    return nullptr;
+}
 std::string getNameFromLine(std::string buffer){
     std::string nome = buffer.substr(13,24);
     nome = std::regex_replace(nome, std::regex("^ +| +$|( ) +"), "$1");
     return nome;
 }
 
-float getGrade(std::string const &input) {
+float getGradeFromLine(std::string input) {
     std::istringstream iss(input);
     std::string token,ret;
     while (std::getline(iss, token, '|'))
@@ -198,4 +292,26 @@ float getGrade(std::string const &input) {
             ret.replace(found, 1, ".");
     }
     return std::stof(ret);
+}
+
+
+std::string readNthLine(const std::string& filename, int N)
+{
+    std::ifstream in(filename.c_str());
+    std::string s;
+    s.reserve(300);
+
+    //skip N lines
+    for(int i = 0; i < N; ++i)
+        std::getline(in, s);
+
+    std::getline(in,s);
+    return s;
+}
+
+void insertAtEnd(const std::string& filename, const std::string& data)
+{
+   std::ofstream out(filename.c_str(), std::ios::app);
+   out << data;
+   out.close();
 }

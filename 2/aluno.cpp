@@ -1,14 +1,18 @@
 #include "aluno.hpp"
 
 //construtor
-Aluno::Aluno(std::string nome)
+Aluno::Aluno(int pos)
 {
-    _name = nome;
-    //seta id como maior
+    _pos = pos;
 }
-Aluno::Aluno(std::string nome, unsigned int id)
+
+Aluno::Aluno(unsigned int id){
+    _id = id;
+}
+
+Aluno::Aluno(unsigned int id, int pos)
 {
-    _name = nome;
+    _pos = pos;
     _id = id;
 }
 
@@ -19,4 +23,13 @@ bool Aluno::compare(Aluno *a1, Aluno *a2)
     } else {
         return false;
     }
+}
+
+int Aluno::getPaperPosition(int paper)
+{
+    for(auto it = results.begin(); it != results.end(); it++){
+        if((*it).first == paper)
+            return (*it).second;
+    }
+    return -1;
 }
