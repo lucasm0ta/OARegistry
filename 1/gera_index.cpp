@@ -58,7 +58,6 @@ int readSecListVariable(char*argv)
 		string token;
 		while(getline(ss, token, '|'))
 		{
-			cout << token << endl;
 			tok.push_back(token);
 		}
 
