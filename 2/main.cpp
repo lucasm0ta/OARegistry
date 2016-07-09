@@ -5,6 +5,7 @@
 #include <fstream>
 #include <regex>
 #include <math.h>
+#include "gera_index.cpp"
 
 std::list<Aluno*> alunos;
 bool sorted = false;
@@ -84,7 +85,6 @@ void populate()
                     }
                 }
             }
-            // sorted = false;
         }
     }
     infile2.close();
@@ -93,23 +93,24 @@ void populate()
     std::ifstream infile3("index_lista3.txt");
     if (infile3) {
         while (std::getline(infile3, line)) {
-            // line is now in buffer
-            // std::cout << line << std::endl;
-            // unsigned int id = getUserIdFromLine(line);//get ID
-            // int pos = getPositionFromLine(line);//get name
-            // int paper = 2;//getPaperIdFromLine(line);//get name
-            // std::cout << id << "-" << paper << "-" << res << std::endl;
-            // for(auto it = alunos.begin(); it != alunos.end(); it++){
-            //     if ((*it)->getId() == id) {
-            //         std::pair<int, int> par(paper, pos);
-            //         (*it)->results.push_front(par);
-            //     }
-            // }
-            // sorted = false;
+            if(line.size() > 4) {
+                // std::cout << "*" <<line << std::endl;
+                unsigned int id = getUserIdFromLine(line);//get ID
+                int pos = getPositionFromLine(line);//get name
+                int paper = 2;//getPaperIdFromLine(line);//get name
+                std::cout << id << "-" << paper << "-" << pos << std::endl;
+                for(auto it = alunos.begin(); it != alunos.end(); it++){
+                    if ((*it)->getId() == id) {
+                        std::pair<int, int> par(paper, pos);
+                        (*it)->results.push_front(par);
+                    }
+                }
+            }
         }
     }
     infile3.close();
     alunos.sort(Aluno::compare);
+    sorted = true;
 }
 int insertStudent()
 {
@@ -120,10 +121,9 @@ int insertStudent()
     std::ostringstream final;
     //checar reg e pegar maior id e incrementar
     unsigned int id = (alunos.size() > 0) ? getHighId() + 1: 0;
-    final << "ID" << std::setfill('0') << std::setw(3) << id;
+    final << "\nID" << std::setfill('0') << std::setw(3) << id;
     final << " 111111 ";
-    final << name << std::setfill(' ') << std::setw(37);
-    final << "34    G         AB\n";
+    final << std::left << std::setw(24) << std::setfill(' ') << name << "34    G         AB";
 
     insertAtEnd("lista1.txt", final.str());
     int pos = 0;
@@ -133,10 +133,9 @@ int insertStudent()
     while (std::getline(myfile, line))
         ++pos;
     alunos.push_back(new Aluno(id, pos-1));
-
     alunos.sort(Aluno::compare);
 
-    //TODO Redo registry of first
+    readList("lista1.txt");
 
     //insere ele na lista1
     // alunos.push_front(new Aluno(name, reg));
@@ -150,7 +149,7 @@ unsigned int getHighId()
         sorted = true;
     }
     if(alunos.size())
-    return alunos.front()->getId();
+        return alunos.front()->getId();
 }
 void printAll()
 {

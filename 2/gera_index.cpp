@@ -193,7 +193,7 @@ int readList(char* argv)
 		}
 	}
 
-	outfile.open(nomesaida.c_str(), ios::app);
+	outfile.open(nomesaida.c_str());
 	rr << setw(3) << setfill('0') << removed;
 	string r = rr.str();
 	outfile << r << endl;
@@ -203,36 +203,5 @@ int readList(char* argv)
 	}
 
 	infile.close();
-	return 0;
-}
-
-int main(int argc, char** argv)
-{
-	using namespace std;
-	int i;
-
-    cout << "Have " << argc-1 << " arguments:" << endl;
-    for(i = 1; i < argc; ++i)
-	{
-        cout << argv[i] << endl;
-    }
-
-	for(i = 1; i < 4; ++i)
-	{
-		ifstream infile;
-		infile.open(argv[i]);
-		if(!infile)
-		{
-			cout << "Arquivo " << i << " nao existe." << endl;
-			return -1;
-		}
-		infile.close();
-	}
-
-	readList(argv[1]);
-	// readList(argv[2]);
-	// readList(argv[3]);
-	// readSecListFixed(argv[1]);
-
 	return 0;
 }
