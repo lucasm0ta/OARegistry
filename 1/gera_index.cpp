@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <iomanip>
+#include <vector>
 
 
 struct node {
@@ -22,6 +23,138 @@ struct secnode
 	seckey *rootkey;
 	secnode *nextsec;
 };
+
+int readSecListVariable(char*argv)
+{
+	using namespace std;
+	int removed = 0;
+
+	vector<string> tok;
+	string token;
+	string line, nomesaida;
+	stringstream rr, ss;
+
+	nomesaida = "sec_";
+	nomesaida.append(argv);
+	cout << nomesaida << endl;
+
+	secnode *rootsec = NULL;
+	secnode *newsecnode;
+	secnode *prevsecnode = new secnode;
+	secnode *tempsec = new secnode;
+
+	seckey *prevseckey = new seckey;
+	seckey *tempseckey = new seckey;
+	seckey *newseckey;
+
+	ifstream infile;
+	ofstream outfile;
+
+	infile.open(argv);
+	while(getline(infile, line))
+	{
+		tok.clear();
+		stringstream ss(line);
+		string token;
+		while(getline(ss, token, '|'))
+		{
+			cout << token << endl;
+			tok.push_back(token);
+		}
+
+		newsecnode = new secnode;
+		newsecnode->nome = tok[2];
+		newsecnode->nextsec = NULL;
+		newsecnode->rootkey = NULL;
+		if(rootsec == NULL)
+		{
+			rootsec = newsecnode;
+			newsecnode->rootkey = new seckey;
+			newsecnode->rootkey->key = tok[0];
+			newsecnode->rootkey->nextseckey = NULL;
+		}
+		else
+		{
+			prevsecnode = NULL;
+			tempsec = rootsec;
+			while(tempsec != NULL && tempsec->nome < newsecnode->nome)
+			{
+				prevsecnode = tempsec;
+				tempsec = tempsec->nextsec;
+			}
+			if((tempsec != NULL) && (tempsec->nome == newsecnode->nome))
+			{
+				newseckey = new seckey;
+				newseckey->key = tok[0];
+				newseckey->nextseckey = NULL;
+				prevseckey = NULL;
+				tempseckey = tempsec->rootkey;
+				while(tempseckey != NULL && tempseckey->key < tok[0])
+				{
+					prevseckey = tempseckey;
+					tempseckey = tempseckey->nextseckey;
+				}
+				if(!tempseckey)
+				{
+					prevseckey->nextseckey = newseckey;
+				}
+				else
+				{
+					if(prevseckey)
+					{
+						newseckey->nextseckey = prevseckey->nextseckey;
+						prevseckey->nextseckey = newseckey;
+					}
+					else
+					{
+						newseckey->nextseckey = tempsec->rootkey;
+						tempsec->rootkey = newseckey;
+					}
+				}
+			}
+			else
+			{
+				if(!tempsec)
+				{
+					prevsecnode->nextsec = newsecnode;
+				}
+				else
+				{
+					if(prevsecnode)
+					{
+						newsecnode->nextsec = prevsecnode->nextsec;
+						prevsecnode->nextsec = newsecnode;
+					}
+					else
+					{
+						newsecnode->nextsec = rootsec;
+						rootsec = newsecnode;
+					}
+				}
+			}
+			newsecnode->rootkey = new seckey;
+			newsecnode->rootkey->key = tok[0];
+			newsecnode->rootkey->nextseckey = NULL;
+		}
+	}
+
+	outfile.open(nomesaida.c_str());
+	rr << setw(3) << setfill('0') << removed;
+	string r = rr.str();
+	outfile << r << endl;
+	for(tempsec = rootsec; tempsec != NULL; tempsec = tempsec->nextsec)
+	{
+		outfile << tempsec->nome;
+		for(tempseckey = tempsec->rootkey; tempseckey != NULL; tempseckey = tempseckey->nextseckey)
+		{
+			outfile << " ";
+			outfile << tempseckey->key;
+		}
+		outfile << endl;
+	}
+
+	infile.close();
+}
 
 int readSecListFixed(char* argv)
 {
@@ -53,7 +186,6 @@ int readSecListFixed(char* argv)
 		newsecnode->nome = line.substr(13, 23);
 		newsecnode->nextsec = NULL;
 		newsecnode->rootkey = NULL;
-		cout << "INSERE: " << newsecnode->nome << endl;
 		if(rootsec == NULL)
 		{
 			rootsec = newsecnode;
@@ -99,7 +231,6 @@ int readSecListFixed(char* argv)
 						tempsec->rootkey = newseckey;
 					}
 				}
-				cout << tempsec->nome << " "<< "IGUAIS" << endl;
 			}
 			else
 			{
@@ -233,6 +364,8 @@ int main(int argc, char** argv)
 	readList(argv[2]);
 	readList(argv[3]);
 	readSecListFixed(argv[1]);
+	readSecListVariable(argv[2]);
+	readSecListVariable(argv[3]);
 
 	return 0;
 }
